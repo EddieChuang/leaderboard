@@ -1,0 +1,10 @@
+#navbar .fa-user-circle {
+  margin-right: 5px;
+}
+
+@media (max-width: 575.98px) {
+  .navbar-expand-sm > .container,
+  .navbar-expand-sm > .container-fluid {
+    padding: 10px !important;
+  }
+}

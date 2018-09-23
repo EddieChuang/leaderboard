@@ -1,0 +1,58 @@
+#submitFileModal .filename {
+  margin-left: 5px;
+  font-size: 1.25rem;
+}
+
+.file-upload-form hr {
+  margin-top: 1px !important;
+  margin-bottom: 1px !important;
+}
+
+.file-upload {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  // clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/********** react-bootstrap-table  **********/
+#submitFileModal .react-bs-container-body {
+  min-height: 150px !important;
+  max-height: 150px !important;
+}
+/********** end **********/
+
+/********** react-dropzone  **********/
+.dropzone {
+  cursor: pointer;
+}
+
+.dropzone > div {
+  width: 100% !important;
+  height: 150px !important;
+  text-align: center !important;
+  transition: border-color 0.1s ease-in, color 0.1s ease-in;
+}
+.dropzone > div:hover {
+  border-color: $light-blue !important;
+  color: $light-blue !important;
+}
+.dropzone .success {
+  border: 2px dashed $light-green;
+  border-radius: 5px;
+  color: $light-green;
+}
+.dropzone .error {
+  border: 2px dashed red;
+  border-radius: 5px;
+  color: red;
+}
+
+.dropzone i {
+  margin-top: 20px;
+}
+/********** end **********/

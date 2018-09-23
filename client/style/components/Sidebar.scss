@@ -1,0 +1,89 @@
+.feather {
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100; /* Behind the navbar */
+  padding: 0;
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 48px; /* Height of navbar */
+  height: calc(100vh - 48px);
+  padding-top: 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+
+.sidebar .nav-link {
+  font-weight: 500;
+  color: #333;
+}
+
+.sidebar .nav-link .feather {
+  margin-right: 4px;
+  color: #999;
+}
+
+.sidebar .nav-link.active {
+  // color: #007bff;  // source code
+  font-weight: bold; // my code
+}
+
+.sidebar .nav-link:hover .feather,
+.sidebar .nav-link.active .feather {
+  color: inherit;
+}
+
+.sidebar-heading {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/********** end of source code **********/
+
+/********** my code **********/
+.sidebar {
+  min-width: 170px;
+  max-width: 170px;
+}
+
+.sidebar .nav-link i {
+  margin-right: 5px;
+}
+
+#competitionList .list-group-item {
+  cursor: pointer;
+  font-size: 0.95rem;
+  border-bottom: none;
+  border-top: none;
+  padding: 0.4rem 0.25rem 0.4rem 1.5rem;
+  transition: background-color 0.3s ease-out;
+}
+
+#competitionList .list-group-item.active {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.125);
+  color: #000;
+}
+
+#competitionList .list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+#competitionList .list-group-item:first-of-type {
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+#competitionList .list-group-item:last-of-type {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding-left: 0;
+}
