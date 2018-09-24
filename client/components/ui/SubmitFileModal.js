@@ -46,14 +46,6 @@ class SubmitFileModal extends React.Component {
     }
   }
 
-  /**
-   * click dropzone to select submission file
-   */
-  // selectFile = e => {
-  //   const file = e.target.files[0]
-  //   this.validateFile(file)
-  // }
-
   uploadFile = () => {
     setTimeout(() => {
       alert('上傳成功')

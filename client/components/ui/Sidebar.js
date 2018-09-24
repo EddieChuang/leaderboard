@@ -1,6 +1,11 @@
 'use strict'
 import React from 'react'
-import { NewCompetitionModal } from '.'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import {
+  switchContent as switchContentAction,
+  switchCompetition as switchCompetitionAction
+} from '../../actions/contentActions'
 
 class Sidebar extends React.Component {
   constructor() {
@@ -15,30 +20,38 @@ class Sidebar extends React.Component {
       <nav className="col-md-2 d-block bg-light sidebar">
         <div className="sidebar-sticky">
           <ul className="nav flex-column">
-            <li className="nav-item">
-              <a className="nav-link active" href="#">
+            <li
+              className="nav-item"
+              onClick={() => this.props.switchContent('0')}>
+              <a href="#" className="nav-link active">
                 <i className="fas fa-home" />
                 Dashboard
               </a>
             </li>
             <li className="nav-item">
               <a
+                href="#"
                 className="nav-link"
-                href="#competitionList"
+                data-target="#competitionList"
                 data-toggle="collapse"
-                aria-expanded="false"
-                aria-controls="collapseExample">
+                aria-expanded="false">
                 <i className="fab fa-ravelry" />
                 Competitions
               </a>
               <ul className="collapse list-group" id="competitionList">
-                <li className="list-group-item active">Text Classification</li>
+                <li
+                  className="list-group-item active"
+                  onClick={() => this.props.switchCompetition('0')}>
+                  Text Classification
+                </li>
                 <li className="list-group-item">NER</li>
                 <li className="list-group-item">Image Caption</li>
                 <li
                   className="list-group-item text-center"
-                  data-toggle="modal"
-                  data-target="#newCompetitionModal">
+                  onClick={() => this.props.switchCompetition('-1')}
+                  // data-toggle="modal"
+                  // data-target="#newCompetitionModal"
+                >
                   <i className="fas fa-plus-circle" />
                 </li>
               </ul>
@@ -57,10 +70,26 @@ class Sidebar extends React.Component {
             </li>
           </ul>
         </div>
-        {/* <NewCompetitionModal /> */}
       </nav>
     )
   }
 }
 
-export default Sidebar
+function mapStateToProps(state) {
+  return {}
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+      switchContent: switchContentAction,
+      switchCompetition: switchCompetitionAction
+    },
+    dispatch
+  )
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Sidebar)
