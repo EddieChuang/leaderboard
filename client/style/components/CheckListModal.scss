@@ -1,0 +1,18 @@
+#checkListModal {
+  font-size: 1.3rem;
+  li {
+    text-decoration: none;
+  }
+  i {
+    width: 25px;
+    height: 25px;
+    margin-right: 0.5rem;
+    text-align: center;
+  }
+  .modal-body {
+    padding: 0;
+  }
+  .alert {
+    margin-bottom: 0;
+  }
+}

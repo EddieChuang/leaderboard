@@ -1,6 +1,7 @@
 import React from 'react'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 import Dropzone from 'react-dropzone'
+import FileHandler from '../../utils/FileHandler'
 
 class SubmitFileModal extends React.Component {
   constructor() {
@@ -29,7 +30,7 @@ class SubmitFileModal extends React.Component {
    * validate submission file is CSV format
    */
   validateFile = file => {
-    if (file.name.substring(file.name.length - 4) === '.csv') {
+    if (FileHandler.getFileExtension(file.name) === 'csv') {
       this.setState({ file, dropzoneClass: 'success', description: file.name })
     } else {
       this.setState({
@@ -177,10 +178,10 @@ class SubmitFileModal extends React.Component {
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={this.uploadFile}>
-                上傳
+                Submit
               </button>
               <button className="btn btn-danger" data-dismiss="modal">
-                取消
+                Cancel
               </button>
             </div>
           </div>

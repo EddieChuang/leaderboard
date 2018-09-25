@@ -2,7 +2,13 @@
 import React, { Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { Navbar, Sidebar, Competition, Dashboard, NewCompetition } from '../ui'
+import {
+  Navbar,
+  Sidebar,
+  Competition,
+  Dashboard,
+  CreateCompetition
+} from '../ui'
 import { SubmitFileModal } from '../ui'
 
 class Home extends React.Component {
@@ -21,7 +27,7 @@ class Home extends React.Component {
     } else if (contentId === '1') {
       content =
         competitionId === '-1' ? (
-          <NewCompetition />
+          <CreateCompetition />
         ) : (
           <Competition competitionId={competitionId} />
         )
@@ -33,7 +39,6 @@ class Home extends React.Component {
     return (
       <Fragment>
         <Navbar />
-        {/* <section> */}
         <div className="container-fluid">
           <div className="row">
             <Sidebar />
@@ -41,7 +46,6 @@ class Home extends React.Component {
             {/* <Competition competitionId={}/> */}
           </div>
         </div>
-        {/* </section> */}
         <SubmitFileModal />
       </Fragment>
     )
