@@ -12,24 +12,25 @@ import {
 import { SubmitFileModal } from '../ui'
 
 class Home extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    console.log('Home constructor')
+    super(props)
     this.state = {}
   }
 
   componentDidMount() {}
 
   renderContent = () => {
-    const { contentId, competitionId } = this.props
+    const { contentId, itemId } = this.props
     let content = <div />
     if (contentId === '0') {
       content = <Dashboard />
     } else if (contentId === '1') {
       content =
-        competitionId === '-1' ? (
+        itemId === '-1' ? (
           <CreateCompetition />
         ) : (
-          <Competition competitionId={competitionId} />
+          <Competition competitionId={itemId} />
         )
     }
     return content
@@ -43,7 +44,6 @@ class Home extends React.Component {
           <div className="row">
             <Sidebar />
             {this.renderContent()}
-            {/* <Competition competitionId={}/> */}
           </div>
         </div>
         <SubmitFileModal />
@@ -55,7 +55,7 @@ class Home extends React.Component {
 function mapStateToProps(state) {
   return {
     contentId: state.content.contentId,
-    competitionId: state.content.competitionId
+    itemId: state.content.itemId
   }
 }
 

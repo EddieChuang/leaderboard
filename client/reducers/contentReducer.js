@@ -4,10 +4,7 @@ import {
   ACTION_COMPETITION_SWITCH
 } from '../constants/actionType'
 
-export function contentReducer(
-  state = { contentId: '0', competitionId: '0' },
-  action
-) {
+export function contentReducer(state = { contentId: '0', itemId: '' }, action) {
   switch (action.type) {
     case ACTION_CONTENT_SWITCH:
       return { ...state, ...action.payload }

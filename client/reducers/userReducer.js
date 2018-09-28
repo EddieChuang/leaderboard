@@ -9,21 +9,13 @@ import {
 export function userReducer(state = { status: true, message: '' }, action) {
   switch (action.type) {
     case ACTION_SIGNIN:
-      return {
-        ...action.payload
-      }
+      return { ...action.payload }
     case ACTION_SIGNUP:
-      return {
-        ...action.payload
-      }
+      return { ...action.payload }
     case ACTION_SIGNUP_ERROR:
-      return {
-        ...action.payload
-      }
+      return { ...action.payload }
     case ACTION_SIGNIN_ERROR:
-      return {
-        ...action.payload
-      }
+      return { ...action.payload }
   }
 
   return state

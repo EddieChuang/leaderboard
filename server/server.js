@@ -33,10 +33,10 @@ app.use(cookieParser())
 
 const authJWT = require('./middleware/auth-jwt')
 const userRoutes = require('./routes/user')
-const exerciseRoutes = require('./routes/exercise')
+const competitionRoutes = require('./routes/competition')
 app.use('/api', authJWT)
 app.use(userRoutes)
-app.use('/api/exercise', exerciseRoutes)
+app.use('/competition', competitionRoutes)
 app.get('*', (req, res) => {
   // console.log(req.get('host') + req.originalUrl)
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'))

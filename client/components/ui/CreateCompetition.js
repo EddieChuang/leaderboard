@@ -1,19 +1,33 @@
 import React from 'react'
-import { EditorState, convertToRaw } from 'draft-js'
+import { EditorState } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
-import draftToHtml from 'draftjs-to-html'
 import renderHTML from 'react-render-html'
 import Dropzone from 'react-dropzone'
+import Datetime from 'react-datetime'
+import moment from 'moment'
 
 import { CheckListModal } from '.'
 
 import FileHandler from '../../utils/FileHandler'
+import EditorHandler from '../../utils/EditorHandler'
 
-import '../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import 'react-datetime/css/react-datetime.css'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
 class CreateCompetition extends React.Component {
   constructor(props) {
+    console.log('constructor')
     super(props)
+    this.dateFormat = 'YYYY-MM-DD HH:mm'
+    this.checkList = [
+      'Fill out the <strong>&nbsp;Competition Title</strong>.',
+      'Fill out the <strong>&nbsp;Description</strong>.',
+      'Fill out the <strong>&nbsp;Data Description</strong>.',
+      'Upload at lease one <strong>&nbsp;Data Source</strong>.',
+      'Upload <strong>&nbsp;One Solution</strong>.'
+      // 'Select a valid <strong>&nbsp;Launch Date</strong>',
+      // 'Select a valid <strong>&nbsp;Close Date</strong>'
+    ]
     this.state = {
       descriptionEditorState: EditorState.createEmpty(),
       dataEditorState: EditorState.createEmpty(),
@@ -21,36 +35,41 @@ class CreateCompetition extends React.Component {
       solutionDescription: '',
       solutionDropzoneClass: '',
       solutionFiles: [],
-      isCheckeds: [false, false, false, false, false]
+      launchDate: moment().format(this.dateFormat),
+      closeDate: moment()
+        .add(1, 'day')
+        .format(this.dateFormat),
+      isCheckeds: new Array(this.checkList.length).fill(false),
+      openLaunchDatePicker: false,
+      openCloseDatePicker: false
     }
-    this.checkList = [
-      'Fill out the <strong>&nbsp;Competition Title</strong>.',
-      'Fill out the <strong>&nbsp;Description</strong>.',
-      'Fill out the <strong>&nbsp;Data Description</strong>.',
-      'Upload at lease one <strong>&nbsp;Data Source</strong>.',
-      'Upload <strong>&nbsp;One Solution</strong>.'
-    ]
   }
 
-  componentDidMount() {}
-
-  /**
-   * extract raw string text from editor
-   * @param {EditorState} editorState The current editor state
-   */
-  getRawText = editorState => {
-    return convertToRaw(editorState.getCurrentContent()).blocks[0].text
+  componentDidMount() {
+    console.log('CreateCompetition componentDidMount')
+    let { launchDate, closeDate } = this.state
+    launchDate = moment()
+      .hour(0)
+      .minute(0)
+      .format(this.dateFormat)
+    closeDate = moment()
+      .add(1, 'day')
+      .hour(0)
+      .minute(0)
+      .format(this.dateFormat)
+    this.setState({ launchDate, closeDate })
   }
 
   onDescriptionEditorStateChange = descriptionEditorState => {
     let { isCheckeds } = this.state
-    isCheckeds[1] = this.getRawText(descriptionEditorState).trim() !== ''
+    isCheckeds[1] =
+      EditorHandler.getRawText(descriptionEditorState).trim() !== ''
     this.setState({ descriptionEditorState, isCheckeds })
   }
 
   onDataEditorStateChange = dataEditorState => {
     let { isCheckeds } = this.state
-    isCheckeds[2] = this.getRawText(dataEditorState).trim() !== ''
+    isCheckeds[2] = EditorHandler.getRawText(dataEditorState).trim() !== ''
     this.setState({ dataEditorState, isCheckeds })
   }
 
@@ -61,21 +80,6 @@ class CreateCompetition extends React.Component {
     let { dataSourceFiles, isCheckeds } = this.state
 
     dataSourceFiles = FileHandler.appendDistinct([...dataSourceFiles], files)
-
-    // for (let i = 0; i < files.length; i++) {
-    //   // ignore file with dulipcate name
-    //   let j
-    //   for (j = 0; j < dataSourceFiles.length; ++j) {
-    //     if (files[i].name === dataSourceFiles[j].name) {
-    //       break
-    //     }
-    //   }
-    //   // accept file
-    //   if (j === dataSourceFiles.length) {
-    //     dataSourceFiles.push(files[i])
-    //   }
-    // }
-
     isCheckeds[3] = dataSourceFiles.length > 0
     this.setState({ dataSourceFiles, isCheckeds })
   }
@@ -84,6 +88,7 @@ class CreateCompetition extends React.Component {
    * onDrop callback, also triggered by selecting file using click
    */
   onDropSolution = files => {
+    console.log(files)
     // only accept CSV format
     if (FileHandler.getFileExtension(files[0].name) !== 'csv') {
       return
@@ -135,27 +140,6 @@ class CreateCompetition extends React.Component {
     this.setState({ dataSourceFiles, solutionFiles, isCheckeds })
   }
 
-  // renderCheckList = () => {
-  //   const { isCheckeds } = this.state
-
-  //   return (
-  //     <ul className="text-monospace p-0 m-0">
-  //       {isCheckeds.map((isChecked, index) => {
-  //         const liClass = isChecked ? 'text-success' : 'text-danger'
-  //         const iClass = isChecked ? 'fa-check' : 'fa-times'
-  //         return (
-  //           <li
-  //             key={index}
-  //             className={`d-flex justify-content-start align-items-center ${liClass}`}>
-  //             <i className={`fas ${iClass} align-items-center`} />
-  //             {renderHTML(this.checkList[index])}
-  //           </li>
-  //         )
-  //       })}
-  //     </ul>
-  //   )
-  // }
-
   /**
    * when description title changed, update the check list
    * @param {Event} e
@@ -166,12 +150,44 @@ class CreateCompetition extends React.Component {
     this.setState({ isCheckeds })
   }
 
-  isReadyToLaunch = () =>
-    this.state.isCheckeds.reduce(
+  /**
+   * when launch date changed, validate launch date and update the check list
+   * @param {Event} date
+   */
+  onLaunchDateChange = date => {
+    let closeDate = moment(this.state.closeDate)
+
+    if (closeDate <= date) {
+      closeDate = moment(date).add(1, 'day')
+    }
+
+    this.setState({
+      launchDate: date.format(this.dateFormat),
+      closeDate: closeDate.format(this.dateFormat)
+    })
+  }
+
+  /**
+   * when launch date changed, validate close date and update the check list
+   * @param {Event} date
+   */
+  onCloseDateChange = date => {
+    this.setState({ closeDate: date.format(this.dateFormat) })
+  }
+
+  /**
+   * return true, if the competition is ready to launch. Otherwise, return false
+   */
+  isReadyToLaunch = () => {
+    return this.state.isCheckeds.reduce(
       (isReady, isChecked) => isReady && isChecked,
       true
     )
+  }
 
+  /**
+   * launch the competition
+   */
   launch = () => {
     let {
       descriptionEditorState,
@@ -179,12 +195,16 @@ class CreateCompetition extends React.Component {
       dataSourceFiles,
       solutionFiles
     } = this.state
-    let title = this.refs.title.value
-    let description = draftToHtml(
-      convertToRaw(descriptionEditorState.getCurrentContent())
+    let title = this.refs.title.value.trim()
+    let description = EditorHandler.getHTML(descriptionEditorState)
+    let dataDescription = EditorHandler.getHTML(dataEditorState)
+
+    let params = new DataForm()
+    dataSourceFiles.forEach(file =>
+      params.append('file', file, `${title}/data sources`)
     )
-    let dataDescription = draftToHtml(
-      convertToRaw(dataEditorState.getCurrentContent())
+    solutionFiles.forEach(file =>
+      params.append('file', file, `${title}/solution`)
     )
   }
 
@@ -194,7 +214,11 @@ class CreateCompetition extends React.Component {
       dataEditorState,
       dataSourceFiles,
       solutionFiles,
-      isCheckeds
+      isCheckeds,
+      launchDate,
+      closeDate,
+      openLaunchDatePicker,
+      openCloseDatePicker
     } = this.state
     const launchBtnClass = this.isReadyToLaunch()
       ? 'btn-success'
@@ -204,14 +228,6 @@ class CreateCompetition extends React.Component {
         id="create-competition"
         role="main"
         className="content-wrapper col pt-3 px-4">
-        {/* <div id="_" className="row mb-2">
-          <div className="col">
-            <h4>Check List</h4>
-            <div className="alert alert-info" role="alert">
-              {this.renderCheckList()}
-            </div>
-          </div>
-        </div> */}
         <div className="row">
           <div className="col">
             <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
@@ -244,7 +260,6 @@ class CreateCompetition extends React.Component {
             </div>
           </div>
         </div>
-
         <div id="create-description" className="row">
           <div className="col py-2 my-2">
             <h4>Description</h4>
@@ -256,7 +271,6 @@ class CreateCompetition extends React.Component {
             />
           </div>
         </div>
-
         <div id="create-data-description" className="row">
           <div className="col py-2 my-2">
             <h4>Data Description</h4>
@@ -320,6 +334,63 @@ class CreateCompetition extends React.Component {
             </div>
           </div>
         </div>
+        <div id="date" className="row mb-5">
+          <div className="col-md-6">
+            <h4>Launch Date</h4>
+            <div
+              className="input-group"
+              onClick={() =>
+                this.setState({
+                  openLaunchDatePicker: !openLaunchDatePicker
+                })
+              }>
+              <div className="input-group-prepend">
+                <i className="far fa-calendar-alt input-group-text" />
+              </div>
+              <input className="form-control" value={launchDate} disabled />
+            </div>
+            <Datetime
+              value={moment(launchDate)}
+              open={openLaunchDatePicker}
+              input={false}
+              isValidDate={date => date.isAfter(moment().subtract(1, 'day'))}
+              dateFormat="YYYY-MM-DD"
+              timeFormat="HH:mm"
+              onChange={this.onLaunchDateChange}
+            />
+          </div>
+          <div className="col-md-6">
+            <h4>Close Date</h4>
+            <div
+              className="input-group"
+              onClick={() =>
+                this.setState({
+                  openCloseDatePicker: !openCloseDatePicker
+                })
+              }>
+              <div className="input-group-prepend">
+                <i className="fas fa-calendar-alt input-group-text" />
+              </div>
+              <input className="form-control" value={closeDate} disabled />
+            </div>
+            <Datetime
+              value={moment(closeDate)}
+              open={openCloseDatePicker}
+              input={false}
+              isValidDate={date => date.isAfter(launchDate)}
+              dateFormat="YYYY-MM-DD"
+              timeFormat="HH:mm"
+              onChange={this.onCloseDateChange}
+            />
+            {/* <DatePicker
+              className="form-control"
+              selected={this.state.closeDate}
+              dateFormat={DateHandler.dateFormat}
+              onChange={this.onCloseDateChange}
+            /> */}
+          </div>
+        </div>
+
         {/* <div id="_" className="row mb-2">
           <div className="col">
             <h4>Check List</h4>
@@ -328,7 +399,7 @@ class CreateCompetition extends React.Component {
             </div>
           </div>
         </div> */}
-        <CheckListModal isCheckeds={isCheckeds} />
+        <CheckListModal isCheckeds={isCheckeds} checkList={this.checkList} />
       </div>
     )
   }

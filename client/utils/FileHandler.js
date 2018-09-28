@@ -1,4 +1,8 @@
 export default {
+  /**
+   * get file extension
+   * @param {String} filename file name
+   */
   getFileExtension: filename => {
     let pos = filename.lastIndexOf('.')
     return pos < filename.length ? filename.slice(pos + 1) : ''
