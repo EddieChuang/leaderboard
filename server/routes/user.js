@@ -3,7 +3,7 @@ const User = require('../models/user')
 const secretConfig = require('../config/secret')
 const jwt = require('jsonwebtoken')
 
-router.route('/user/signup').post((req, res, next) => {
+router.route('/signup').post((req, res, next) => {
   const { username, password } = req.body
   User.findOne({ username }, function(err, existingUser) {
     if (err) {
@@ -29,7 +29,7 @@ router.route('/user/signup').post((req, res, next) => {
   })
 })
 
-router.route('/user/signin').post((req, res, next) => {
+router.route('/signin').post((req, res, next) => {
   const { username, password } = req.body
   User.findOne({ username }, function(err, user) {
     if (err) {

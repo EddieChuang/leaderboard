@@ -4,7 +4,10 @@ import { SubmitFileModal, NewCompetitionModal } from '.'
 import '../../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css'
 
 class Competition extends React.Component {
-  componentDidMount() {}
+  componentDidMount() {
+    // get competition
+    const { competitionId } = this.props
+  }
 
   renderLeaderboard = () => {
     var products = [

@@ -3,6 +3,7 @@ import renderHTML from 'react-render-html'
 
 class CheckListModal extends React.Component {
   constructor() {
+    console.log('CheckListModal constructor')
     super()
     // this.checkList = [
     //   'Fill out the <strong>&nbsp;Competition Title</strong>.',
@@ -20,12 +21,18 @@ class CheckListModal extends React.Component {
    * bind event. reset modal state after closing modal
    */
   componentDidMount() {
+    // console.log('CheckListModal componentDidMount')
     $('#checkListModal').on('hidden.bs.modal', () => {})
     const { isCheckeds, checkList } = this.props
     this.setState({ isCheckeds, checkList })
   }
 
+  componentWillUnmount() {
+    // console.log('CheckListModal componentWillUnmount')
+  }
+
   componentWillReceiveProps(props) {
+    // console.log('CheckListModal componentWillReceiveProps')
     const { isCheckeds, checkList } = props
     this.setState({ isCheckeds, checkList })
   }
@@ -52,6 +59,7 @@ class CheckListModal extends React.Component {
   }
 
   render() {
+    // console.log('CheckListModal redner')
     return (
       <div className="modal fade" id="checkListModal">
         <div className="modal-dialog modal-lg">

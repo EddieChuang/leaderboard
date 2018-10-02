@@ -1,10 +1,13 @@
 import React from 'react'
 import { EditorState } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
-import renderHTML from 'react-render-html'
 import Dropzone from 'react-dropzone'
 import Datetime from 'react-datetime'
 import moment from 'moment'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+
+import { createCompetition as createCompetitionAction } from '../../actions/competitionAction'
 
 import { CheckListModal } from '.'
 
@@ -16,7 +19,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
 class CreateCompetition extends React.Component {
   constructor(props) {
-    console.log('constructor')
+    console.log('CreateCompetition constructor')
     super(props)
     this.dateFormat = 'YYYY-MM-DD HH:mm'
     this.checkList = [
@@ -29,18 +32,23 @@ class CreateCompetition extends React.Component {
       // 'Select a valid <strong>&nbsp;Close Date</strong>'
     ]
     this.state = {
+      /** {EditorState} problem description editor state*/
       descriptionEditorState: EditorState.createEmpty(),
-      dataEditorState: EditorState.createEmpty(),
+      /** {EditorState} data description editor state*/
+      dataEditorState: EditorState.createEmpty(), // EditorState object
+      /** {Array} array of File object for data source files */
       dataSourceFiles: [],
-      solutionDescription: '',
-      solutionDropzoneClass: '',
+      /** {Array} array of File object for one solution file. Only one solution is accepted */
       solutionFiles: [],
-      launchDate: moment().format(this.dateFormat),
-      closeDate: moment()
-        .add(1, 'day')
-        .format(this.dateFormat),
+      /** {String} launch date for competition */
+      launchDate: '',
+      /** {String} close date for competition */
+      closeDate: '',
+      /** {Array} related to checkList and to determine whether the competition is ready to launch */
       isCheckeds: new Array(this.checkList.length).fill(false),
+      /** {Boolean} <DateTime/> for launch date is open or not */
       openLaunchDatePicker: false,
+      /** {Boolean} <DateTime/> for close date is open or not */
       openCloseDatePicker: false
     }
   }
@@ -58,6 +66,10 @@ class CreateCompetition extends React.Component {
       .minute(0)
       .format(this.dateFormat)
     this.setState({ launchDate, closeDate })
+  }
+
+  componentWillUnmount() {
+    console.log('CreateCompetition componentWillUnmount')
   }
 
   onDescriptionEditorStateChange = descriptionEditorState => {
@@ -193,22 +205,36 @@ class CreateCompetition extends React.Component {
       descriptionEditorState,
       dataEditorState,
       dataSourceFiles,
-      solutionFiles
+      solutionFiles,
+      launchDate,
+      closeDate
     } = this.state
     let title = this.refs.title.value.trim()
     let description = EditorHandler.getHTML(descriptionEditorState)
     let dataDescription = EditorHandler.getHTML(dataEditorState)
 
-    let params = new DataForm()
+    let params = new FormData()
+    params.append('title', title)
+    params.append('description', description)
+    params.append('dataDescription', dataDescription)
+    params.append('launchDate', launchDate)
+    params.append('closeDate', closeDate)
     dataSourceFiles.forEach(file =>
-      params.append('file', file, `${title}/data sources`)
+      params.append(`${title}/data sources`, file)
     )
-    solutionFiles.forEach(file =>
-      params.append('file', file, `${title}/solution`)
-    )
+    solutionFiles.forEach(file => params.append(`${title}/solution`, file))
+    // console.log('title', params.get('title'))
+    // console.log('description', params.get('description'))
+    // console.log('dataDescription', params.get('dataDescription'))
+    // console.log('launchDate', params.get('launchDate'))
+    // console.log('closeDate', params.get('closeDate'))
+    // console.log('dataSourceFiles', params.get('file'))
+    // console.log('solutionFiles', params.get('file'))
+    this.props.createCompetition(params, () => {})
   }
 
   render() {
+    console.log('CreateCompeition redner')
     const {
       descriptionEditorState,
       dataEditorState,
@@ -382,27 +408,29 @@ class CreateCompetition extends React.Component {
               timeFormat="HH:mm"
               onChange={this.onCloseDateChange}
             />
-            {/* <DatePicker
-              className="form-control"
-              selected={this.state.closeDate}
-              dateFormat={DateHandler.dateFormat}
-              onChange={this.onCloseDateChange}
-            /> */}
           </div>
         </div>
 
-        {/* <div id="_" className="row mb-2">
-          <div className="col">
-            <h4>Check List</h4>
-            <div className="alert alert-info" role="alert">
-              {this.renderCheckList()}
-            </div>
-          </div>
-        </div> */}
         <CheckListModal isCheckeds={isCheckeds} checkList={this.checkList} />
       </div>
     )
   }
 }
 
-export default CreateCompetition
+function mapStateToProps(state) {
+  return {}
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+      createCompetition: createCompetitionAction
+    },
+    dispatch
+  )
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateCompetition)

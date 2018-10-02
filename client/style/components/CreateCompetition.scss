@@ -53,7 +53,10 @@
   .form-control {
     cursor: pointer;
   }
-  .rdtDays {
+  .rdtYears,
+  .rdtMonths,
+  .rdtDays,
+  .rdtTime {
     border: 1px solid $secondary;
     border-radius: 5px;
   }

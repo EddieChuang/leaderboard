@@ -3,7 +3,6 @@ const multer = require('multer')
 const async = require('async')
 const path = require('path')
 const fse = require('fs-extra')
-const FileHandler = require('../utils/FileHandler')
 
 // const Competition = require('../models/competition')
 
@@ -35,6 +34,7 @@ const FileHandler = require('../utils/FileHandler')
 
 const storage = multer.diskStorage({
   destination: function(req, file, callback) {
+    console.log(file)
     const title = file.fieldname.split('/')[0]
     const competitionDir = path.join(__dirname, `../upload/${title}`)
     const uploadDir = path.join(__dirname, `../upload/${file.fieldname}`)
@@ -44,9 +44,12 @@ const storage = multer.diskStorage({
     if (!fse.pathExistsSync(competitionDir)) {
       fse.ensureDirSync(competitionDir)
     }
+    if (!fse.pathExistsSync(uploadDir)) {
+      fse.ensureDirSync(uploadDir)
+    }
 
-    fse.removeSync(uploadDir) // ensure  the directory is empty
-    fse.ensureDirSync(uploadDir)
+    // fse.removeSync(uploadDir) // ensure  the directory is empty
+    // fse.ensureDirSync(uploadDir)
 
     callback(null, uploadDir)
   },
@@ -59,17 +62,18 @@ const upload = multer({ storage })
 
 // create a new competition
 router.route('/create').post(upload.any(), (req, res, next) => {
-  let { title, description, dataDescription, launchDate, closeDate } = req.body
-  Competition.find({ title }, function(err, existingCompetition) {
-    if (existingCompetition) {
-      res.status(400)
-      res.json({ status: false, message: `Title ${title} is already taken.` })
-    }
-  })
+  // let { title, description, dataDescription, launchDate, closeDate } = req.body
+  // Competition.find({ title }, function(err, existingCompetition) {
+  //   if (existingCompetition) {
+  //     res.status(400)
+  //     res.json({ status: false, message: `Title ${title} is already taken.` })
+  //   }
+  // })
 
   async.waterfall([
     // upload data source files
     function(callback) {
+      data = ''
       callback(null, data)
     },
     // upload solution files
@@ -79,7 +83,7 @@ router.route('/create').post(upload.any(), (req, res, next) => {
     // save competition
     function(data, callback) {
       res.status(200)
-      res.json({ status: true, message: '新增成功', newExercise })
+      res.json({ status: true, message: '新增成功' })
       // let newCompetition = new Exercise()
       // newCompetition.title = title
       // newCompetition.description = description

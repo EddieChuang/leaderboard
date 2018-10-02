@@ -15,6 +15,21 @@ class Sidebar extends React.Component {
 
   componentDidMount() {}
 
+  renderCompetition = () => {
+    const { activeId, competitions } = this.props
+    return competitions.map(competition => {
+      const isActive = competition.id === activeId
+      const className = 'list-group-item ' + isActive ? 'active' : ''
+      return (
+        <li
+          className={className}
+          onClick={() => this.props.switchContent('1', competition.id)}>
+          {competition.title}
+        </li>
+      )
+    })
+  }
+
   render() {
     return (
       <nav className="col-md-2 d-block bg-light sidebar">
@@ -42,16 +57,14 @@ class Sidebar extends React.Component {
                 <li
                   className="list-group-item active"
                   onClick={() => this.props.switchContent('1', '0')}>
+                  {/* {this.renderCompetition()} */}
                   Text Classification
                 </li>
                 <li className="list-group-item">NER</li>
                 <li className="list-group-item">Image Caption</li>
                 <li
                   className="list-group-item text-center"
-                  onClick={() => this.props.switchContent('1', '-1')}
-                  // data-toggle="modal"
-                  // data-target="#newCompetitionModal"
-                >
+                  onClick={() => this.props.switchContent('1', '-1')}>
                   <i className="fas fa-plus-circle" />
                 </li>
               </ul>
@@ -76,7 +89,10 @@ class Sidebar extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return {}
+  return {
+    // comepetitions: state.competition.competition,
+    // activeId: state.competition.competitionId
+  }
 }
 
 function mapDispatchToProps(dispatch) {

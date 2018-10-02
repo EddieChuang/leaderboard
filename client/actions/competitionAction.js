@@ -5,6 +5,14 @@ import {
   ACTION_COMPETITION_SWITCH
 } from '../constants/actionType'
 
-export function createCompetition(competition) {
-  return dispatch => {}
+import CompetitionHandler from '../utils/CompetitionHandler'
+
+/**
+ *
+ * @param {FormData} newCompetition
+ */
+export function createCompetition(newCompetition) {
+  return dispatch => {
+    CompetitionHandler.create(newCompetition, () => {})
+  }
 }
