@@ -4,7 +4,7 @@ const async = require('async')
 const path = require('path')
 const fse = require('fs-extra')
 
-// const Competition = require('../models/competition')
+const Competition = require('../models/competition')
 
 // get all competition
 // router.get('/', (req, res, next) => {
@@ -34,22 +34,14 @@ const fse = require('fs-extra')
 
 const storage = multer.diskStorage({
   destination: function(req, file, callback) {
-    console.log(file)
     const title = file.fieldname.split('/')[0]
     const competitionDir = path.join(__dirname, `../upload/${title}`)
     const uploadDir = path.join(__dirname, `../upload/${file.fieldname}`)
     console.log(competitionDir)
     console.log(uploadDir)
 
-    if (!fse.pathExistsSync(competitionDir)) {
-      fse.ensureDirSync(competitionDir)
-    }
-    if (!fse.pathExistsSync(uploadDir)) {
-      fse.ensureDirSync(uploadDir)
-    }
-
-    // fse.removeSync(uploadDir) // ensure  the directory is empty
-    // fse.ensureDirSync(uploadDir)
+    !fse.pathExistsSync(competitionDir) ? fse.ensureDirSync(competitionDir) : ''
+    !fse.pathExistsSync(uploadDir) ? fse.ensureDirSync(uploadDir) : ''
 
     callback(null, uploadDir)
   },
@@ -58,64 +50,73 @@ const storage = multer.diskStorage({
   }
 })
 
-const upload = multer({ storage })
+const upload = multer({ storage }).any()
 
 // create a new competition
-router.route('/create').post(upload.any(), (req, res, next) => {
-  // let { title, description, dataDescription, launchDate, closeDate } = req.body
-  // Competition.find({ title }, function(err, existingCompetition) {
-  //   if (existingCompetition) {
-  //     res.status(400)
-  //     res.json({ status: false, message: `Title ${title} is already taken.` })
-  //   }
-  // })
+router.route('/create/:title').post((req, res, next) => {
+  let { title } = req.params
+  Competition.findOne({ title }, function(err, existingCompetition) {
+    if (existingCompetition) {
+      res.status(400).json({
+        status: false,
+        message: `Title ${title} is already taken.`
+      })
+    } else {
+      upload(req, res, err => {
+        if (err) {
+          res
+            .status(400)
+            .json({ status: false, message: 'Failed to upload files.' })
+        }
 
-  async.waterfall([
-    // upload data source files
-    function(callback) {
-      data = ''
-      callback(null, data)
-    },
-    // upload solution files
-    function(data, callback) {
-      callback(null, data)
-    },
-    // save competition
-    function(data, callback) {
-      res.status(200)
-      res.json({ status: true, message: '新增成功' })
-      // let newCompetition = new Exercise()
-      // newCompetition.title = title
-      // newCompetition.description = description
-      // newCompetition.dataDescription = dataDescription
-      // newCompetition.launchDate = launchDate
-      // newCompetition.closeDate = closeDate
-      // newCompetition.save(function(err) {
-      //   if (err) {
-      //     res.status(400)
-      //     res.json({ status: false, message: '伺服器錯誤' })
-      //   } else {
-      //     res.status(200)
-      //     res.json({ status: true, message: '新增成功', newExercise })
-      //   }
-      // })
-    }
-  ])
+        let { description, dataDescription, launchDate, closeDate } = req.body
+        let dataSources = req.files
+          .filter(file => file.fieldname.split('/')[1] === 'data sources') // file type
+          .map(file => file.filename)
+        let solution = req.files
+          .filter(file => file.fieldname.split('/')[1] === 'solution') // file type
+          .map(file => file.filename)
+
+        console.log(req.body)
+        console.log(req.files)
+        console.log(dataSources)
+        console.log(solution)
+        let newCompetition = new Competition()
+        newCompetition.title = title
+        newCompetition.description = description
+        newCompetition.dataDescription = dataDescription
+        newCompetition.launchDate = launchDate
+        newCompetition.closeDate = closeDate
+        newCompetition.dataSources = dataSources
+        newCompetition.dataSources = solution
+
+        newCompetition.save(function(err) {
+          if (err) {
+            res.status(400)
+            res.json({ status: false, message: 'Server Error' })
+          } else {
+            let payload = { competitionId: newCompetition._id }
+            res.status(200).json({ status: true, message: 'Success', payload })
+          }
+        })
+      })
+    } // end of else
+  })
 })
 
-router.route('/get').post((req, res, next) => {
-  Exercise.find({})
-    .sort('created')
-    .exec(function(err, exercises) {
-      if (err) {
-        res.status(400)
-        res.json({ status: false, message: '伺服器錯誤' })
-      } else {
-        res.status(200)
-        res.json({ status: true, exercises })
-      }
-    })
-})
+// router.route('/get').post((req, res, next) => {
+//   Exercise.find({})
+//     .sort('created')
+//     .exec(function(err, exercises) {
+//       if (err) {
+//         res.status(400)
+//         res.json({ status: false, message: '伺服器錯誤' })
+//       } else {
+//         res.status(200)
+//         res.json({ status: true, exercises })
+//       }
+//     })
+// })
 
 // router.post('/api/tweet/like', (req, res, next) => {
 //   const { id, idToLike } = req.body

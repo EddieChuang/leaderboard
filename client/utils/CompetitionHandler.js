@@ -20,14 +20,13 @@ export default {
    * @param {Function} callback
    */
   create: (newCompetition, callback) => {
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-        token: auth.getToken()
-      }
-    }
+    const config = { headers: { token: auth.getToken() } }
     axios
-      .post(URL_COMPETITION_CREATE, newCompetition, config)
+      .post(
+        `${URL_COMPETITION_CREATE}/${newCompetition.get('title')}`,
+        newCompetition,
+        config
+      )
       .then(res => {
         console.log(res)
         // callback(true, res.data.message, res.data.newExercise)

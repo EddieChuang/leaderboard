@@ -4,10 +4,11 @@ const CompetitionSchema = new Schema({
   title: String,
   description: String,
   dataDescription: String,
-  dataSources: [{ filepath: String, filename: String }],
-  solution: [{ filepath: String, filename: String }],
-  launchDate: { type: Date },
-  closeDate: { type: Date }
+  dataSources: [String],
+  solution: [String],
+  launchDate: Date,
+  closeDate: Date,
+  createdDate: { type: Date, default: Date.now }
 })
 
 // CompetitionSchema.methods.getAll = function() {
