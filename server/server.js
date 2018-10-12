@@ -17,8 +17,7 @@ mongoose.connect(
   secretConfig.database,
   err => {
     if (err) {
-      console.log(err)
-      return
+      return console.log(err)
     }
     console.log('Connected to the mongo database')
   }
@@ -44,6 +43,8 @@ app.get('*', (req, res) => {
 
 const port = process.env.PORT || 3000
 http.listen(port, err => {
-  if (err) console.log(err)
+  if (err) {
+    console.log(err)
+  }
   console.log('Server is listening on port 3000 ...')
 })
