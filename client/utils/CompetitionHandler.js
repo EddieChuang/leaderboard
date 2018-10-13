@@ -29,10 +29,11 @@ export default {
       )
       .then(res => {
         console.log(res)
-        // callback(true, res.data.message, res.data.newExercise)
+        callback(true, res.data) // data = { message: competitionId }
       })
       .catch(err => {
         console.log(err.response)
+        callback(false, err.response.data) // data = { message: competitionId }
         // if (err.response.status === 403) {
         //   alert('請重新登入')
         //   auth.signout()

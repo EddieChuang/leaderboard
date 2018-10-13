@@ -15,6 +15,7 @@ const http = require('http').Server(app)
 
 mongoose.connect(
   secretConfig.database,
+  { useNewUrlParser: true },
   err => {
     if (err) {
       return console.log(err)

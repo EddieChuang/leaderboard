@@ -6,6 +6,7 @@ import Datetime from 'react-datetime'
 import moment from 'moment'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import SweetAlert from 'sweetalert-react'
 
 import { createCompetition as createCompetitionAction } from '../../actions/competitionAction'
 
@@ -16,6 +17,7 @@ import EditorHandler from '../../utils/EditorHandler'
 
 import 'react-datetime/css/react-datetime.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import 'sweetalert/dist/sweetalert.css'
 
 class CreateCompetition extends React.Component {
   constructor(props) {
@@ -49,7 +51,23 @@ class CreateCompetition extends React.Component {
       /** {Boolean} <DateTime/> for launch date is open or not */
       openLaunchDatePicker: false,
       /** {Boolean} <DateTime/> for close date is open or not */
-      openCloseDatePicker: false
+      openCloseDatePicker: false,
+      /** {String} alert icon ['success', 'error', 'warning', 'info']*/
+      alertIcon: '',
+      /** {Boolean} whether to show alert */
+      alertShow: false,
+      /** {String} alert title */
+      alertTitle: '',
+      /** {String} alert text */
+      alertText: '',
+      /** {Boolean} whether to show alert cancel button */
+      alertShowCancelButton: false,
+      /** {Object} alert confirm button config */
+      // alertConfirmBtnText: '',
+      /** {Object} alert cancel button config */
+      // alertCancelBtnText: '',
+      /** {Function} onclick alert confirm callback */
+      onAlertConfirm: () => {}
     }
   }
 
@@ -122,7 +140,8 @@ class CreateCompetition extends React.Component {
           return (
             <li
               key={index}
-              className="list-group-item d-flex justify-content-start align-items-center">
+              className="list-group-item d-flex justify-content-start align-items-center"
+            >
               <i
                 className="fas fa-trash"
                 onClick={() => this.removeFile(type, index)}
@@ -197,6 +216,22 @@ class CreateCompetition extends React.Component {
     )
   }
 
+  confirmLaunch = () => {
+    this.setState({
+      alertIcon: 'info',
+      alertShow: true,
+      alertTitle: 'Confirm',
+      alertText: 'Are you sure to launch the competition',
+      alertShowCancelButton: true,
+      // alertConfirmBtnText: 'Launch',
+      // alertCancelBtnText: 'Cancel',
+      onAlertConfirm: () => {
+        this.setState({ alertShow: false })
+        this.launch()
+      }
+    })
+  }
+
   /**
    * launch the competition
    */
@@ -230,7 +265,19 @@ class CreateCompetition extends React.Component {
     // console.log('closeDate', params.get('closeDate'))
     // console.log('dataSourceFiles', params.get('file'))
     // console.log('solutionFiles', params.get('file'))
-    this.props.createCompetition(params, () => {})
+    this.props.createCompetition(params, (success, alertText) => {
+      this.setState({
+        alertIcon: success ? 'success' : 'error',
+        alertShow: true,
+        alertTitle: success ? 'Created Successfully' : 'Created Failed',
+        alertText,
+        alertShowCancelButton: false,
+        // alertConfirmBtnText: 'OK',
+        onAlertConfirm: () => {
+          this.setState({ alertShow: false })
+        }
+      })
+    })
   }
 
   render() {
@@ -253,7 +300,8 @@ class CreateCompetition extends React.Component {
       <div
         id="create-competition"
         role="main"
-        className="content-wrapper col pt-3 px-4">
+        className="content-wrapper col pt-3 px-4"
+      >
         <div className="row">
           <div className="col">
             <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
@@ -271,13 +319,15 @@ class CreateCompetition extends React.Component {
                   <button
                     disabled={!this.isReadyToLaunch()}
                     className={`btn btn-md ${launchBtnClass}`}
-                    onClick={() => this.launch()}>
+                    onClick={() => this.confirmLaunch()}
+                  >
                     Launch
                   </button>
                   <button
                     className="btn btn-md btn-info"
                     data-toggle="modal"
-                    data-target="#checkListModal">
+                    data-target="#checkListModal"
+                  >
                     Check
                   </button>
                   <button className="btn btn-md btn-warning">Preview</button>
@@ -323,7 +373,8 @@ class CreateCompetition extends React.Component {
                         <Dropzone
                           activeClassName="success"
                           onDrop={this.onDropDataSources}
-                          multiple={true}>
+                          multiple={true}
+                        >
                           <i className="fas fa-upload fa-5x" />
                           <p className="filename">Upload Data Sources</p>
                         </Dropzone>
@@ -348,7 +399,8 @@ class CreateCompetition extends React.Component {
                         <Dropzone
                           activeClassName="success"
                           onDrop={this.onDropSolution}
-                          multiple={false}>
+                          multiple={false}
+                        >
                           <i className="fas fa-upload fa-5x" />
                           <p className="filename">Upload Solution(.csv)</p>
                         </Dropzone>
@@ -369,7 +421,8 @@ class CreateCompetition extends React.Component {
                 this.setState({
                   openLaunchDatePicker: !openLaunchDatePicker
                 })
-              }>
+              }
+            >
               <div className="input-group-prepend">
                 <i className="far fa-calendar-alt input-group-text" />
               </div>
@@ -393,7 +446,8 @@ class CreateCompetition extends React.Component {
                 this.setState({
                   openCloseDatePicker: !openCloseDatePicker
                 })
-              }>
+              }
+            >
               <div className="input-group-prepend">
                 <i className="fas fa-calendar-alt input-group-text" />
               </div>
@@ -412,6 +466,20 @@ class CreateCompetition extends React.Component {
         </div>
 
         <CheckListModal isCheckeds={isCheckeds} checkList={this.checkList} />
+        <SweetAlert
+          // warning={true}
+          icon={this.state.alertIcon}
+          show={this.state.alertShow}
+          title={this.state.alertTitle}
+          text={this.state.alertText}
+          showCancelButton={this.state.alertShowCancelButton}
+          onConfirm={this.state.onAlertConfirm}
+          onCancel={() => {
+            this.setState({ alertShow: false })
+          }}
+          // confirmBtnText={this.state.alertConfirmBtnText}
+          // cancelBtnText={this.state.alertCancelBtnText}
+        />
       </div>
     )
   }

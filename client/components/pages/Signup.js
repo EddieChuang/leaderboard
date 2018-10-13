@@ -52,7 +52,8 @@ class Signup extends React.Component {
                             <button
                               tabIndex="-1"
                               className="btn btn-outline-secondary"
-                              type="button">
+                              type="button"
+                            >
                               <i className="fas fa-user" />
                             </button>
                           </div>
@@ -70,7 +71,8 @@ class Signup extends React.Component {
                             <button
                               tabIndex="-1"
                               className="btn btn-outline-secondary"
-                              type="button">
+                              type="button"
+                            >
                               <i className="fas fa-lock" />
                             </button>
                           </div>
@@ -88,7 +90,8 @@ class Signup extends React.Component {
                             <button
                               tabIndex="-1"
                               className="btn btn-outline-secondary"
-                              type="button">
+                              type="button"
+                            >
                               <i className="fas fa-lock" />
                             </button>
                           </div>
