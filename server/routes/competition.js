@@ -3,26 +3,35 @@ const multer = require('multer')
 const async = require('async')
 const path = require('path')
 const fse = require('fs-extra')
+const moment = require('moment')
 
 const Competition = require('../models/competition')
 
+const dateFormat = 'YYYY-MM-DD HH:mm'
+
+router.post('/get', (req, res, next) => {
+  let { competitionId } = req.body
+  Competition.findById(competitionId).exec(function(err, competition) {
+    if (err) {
+      return res.status(500).json({ message: 'Server Error' })
+    }
+    res.status(200).json({ competition })
+  })
+})
+
 // get all competition
-// router.get('/', (req, res, next) => {
-//   Tweet.find({})
-//     .sort('created')
-//     .populate({
-//       path: 'owner comments',
-//       select: '_id name text speaker created',
-//       populate: {
-//         path: 'speaker',
-//         select: '_id name photo'
-//       }
-//     })
-//     .exec(function(err, tweets) {
-//       // console.log(tweets)
-//       res.json({ tweets })
-//     })
-// })
+router.post('/getall', (req, res, next) => {
+  const now = moment().format(dateFormat)
+  Competition.find({ launchDate: { $lt: now }, closeDate: { $gt: now } })
+    .sort('createdDate')
+    .select('_id title')
+    .exec(function(err, competitions) {
+      if (err) {
+        return res.status(500).json({ message: 'Server Error' })
+      }
+      res.status(200).json({ competitions })
+    })
+})
 
 // get the competition with _id==id
 // router.post('/:id', (req, res, next) => {
@@ -37,8 +46,6 @@ const storage = multer.diskStorage({
     const title = file.fieldname.split('/')[0]
     const competitionDir = path.join(__dirname, `../upload/${title}`)
     const uploadDir = path.join(__dirname, `../upload/${file.fieldname}`)
-    console.log(competitionDir)
-    console.log(uploadDir)
 
     !fse.pathExistsSync(competitionDir) ? fse.ensureDirSync(competitionDir) : ''
     !fse.pathExistsSync(uploadDir) ? fse.ensureDirSync(uploadDir) : ''
@@ -77,10 +84,6 @@ router.route('/create/:title').post((req, res, next) => {
           .filter(file => file.fieldname.split('/')[1] === 'solution') // file type
           .map(file => file.filename)
 
-        console.log(req.body)
-        console.log(req.files)
-        console.log(dataSources)
-        console.log(solution)
         let newCompetition = new Competition()
         newCompetition.title = title
         newCompetition.description = description
@@ -95,8 +98,13 @@ router.route('/create/:title').post((req, res, next) => {
             res.status(400)
             res.json({ status: false, message: 'Server Error' })
           } else {
-            let payload = { competitionId: newCompetition._id }
-            res.status(200).json({ status: true, message: 'Success', payload })
+            let competition = {
+              _id: newCompetition._id,
+              title: newCompetition.title
+            }
+            res
+              .status(200)
+              .json({ status: true, message: 'Success', competition })
           }
         })
       })

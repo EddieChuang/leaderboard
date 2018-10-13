@@ -1,8 +1,24 @@
 import axios from 'axios'
-import { URL_COMPETITION_GET, URL_COMPETITION_CREATE } from '../constants/url'
+import {
+  URL_COMPETITION_GETALL,
+  URL_COMPETITION_CREATE,
+  URL_COMPETITION_GET
+} from '../constants/url'
 import auth from '../utils/auth'
 
 export default {
+  get: (competitionId, callback) => {
+    axios
+      .post(URL_COMPETITION_GET, { token: auth.getToken(), competitionId })
+      .then(res => {
+        console.log(res)
+        callback(res.data.competition)
+      })
+      .catch(err => {
+        console.log(err.response)
+        alert(err.response.data.message)
+      })
+  },
   getAll: callback => {
     axios
       .post(URL_COMPETITION_GETALL, { token: auth.getToken() })
@@ -12,7 +28,7 @@ export default {
       })
       .catch(err => {
         console.log(err.response)
-        callback([])
+        alert(err.response.data.message)
       })
   },
 
@@ -31,11 +47,11 @@ export default {
       )
       .then(res => {
         console.log(res)
-        callback(true, res.data) // data = { message: competitionId }
+        callback(true, res.data) // data = { status, message, competition: {_id, title} }
       })
       .catch(err => {
         console.log(err.response)
-        callback(false, err.response.data) // data = { message: competitionId }
+        callback(false, err.response.data)
         // if (err.response.status === 403) {
         //   alert('請重新登入')
         //   auth.signout()

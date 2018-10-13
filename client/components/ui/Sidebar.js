@@ -18,12 +18,13 @@ class Sidebar extends React.Component {
   renderCompetition = () => {
     const { activeId, competitions } = this.props
     return competitions.map(competition => {
-      const isActive = competition.id === activeId
-      const className = 'list-group-item ' + isActive ? 'active' : ''
+      const isActive = competition._id === activeId
+      const className = 'list-group-item ' + (isActive ? 'active' : '')
       return (
         <li
+          key={competition._id}
           className={className}
-          onClick={() => this.props.switchContent('1', competition.id)}
+          onClick={() => this.props.switchContent('1', competition._id)}
         >
           {competition.title}
         </li>
@@ -57,15 +58,7 @@ class Sidebar extends React.Component {
                 Competitions
               </a>
               <ul className="collapse list-group" id="competitionList">
-                <li
-                  className="list-group-item active"
-                  onClick={() => this.props.switchContent('1', '0')}
-                >
-                  Text Classification
-                </li>
-                {/* {this.renderCompetition()} */}
-                <li className="list-group-item">NER</li>
-                <li className="list-group-item">Image Caption</li>
+                {this.renderCompetition()}
                 <li
                   className="list-group-item text-center"
                   onClick={() => this.props.switchContent('1', '-1')}
@@ -95,7 +88,7 @@ class Sidebar extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    comepetitions: state.competition.competitions,
+    competitions: state.competition.competitions,
     activeId: state.competition.activeId
   }
 }

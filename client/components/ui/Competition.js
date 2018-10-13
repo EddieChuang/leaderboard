@@ -1,12 +1,34 @@
 import React from 'react'
+import renderHTML from 'react-render-html'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
-import { SubmitFileModal, NewCompetitionModal } from '.'
+
+import { SubmitFileModal } from '.'
+
+import CompetitionHandler from '../../utils/CompetitionHandler'
+
 import '../../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css'
 
 class Competition extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      competition: { title: '', description: '', dataDescription: '' }
+    }
+  }
+
   componentDidMount() {
-    // get competition
-    const { competitionId } = this.props
+    console.log('Competition componentDidMount')
+    CompetitionHandler.get(this.props.competitionId, competition => {
+      console.log()
+      this.setState({ competition })
+    })
+  }
+
+  componentWillReceiveProps(props) {
+    console.log('Competition componentWillReceiveProps')
+    CompetitionHandler.get(props.competitionId, competition => {
+      this.setState({ competition })
+    })
   }
 
   renderLeaderboard = () => {
@@ -48,7 +70,8 @@ class Competition extends React.Component {
         bordered={false}
         hover
         striped
-        version="4">
+        version="4"
+      >
         <TableHeaderColumn isKey dataField="rank">
           Rank
         </TableHeaderColumn>
@@ -60,19 +83,23 @@ class Competition extends React.Component {
   }
 
   render() {
+    let { competition } = this.state
+    console.log('Competition render')
     return (
       <div
         id="competition"
         role="main"
-        className="content-wrapper col pt-3 px-4">
+        className="content-wrapper col pt-3 px-4"
+      >
         <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-          <h1 className="h2">Text Classification</h1>
+          <h1 className="h2">{competition.title}</h1>
           <div className="btn-toolbar mb-2 mb-md-0">
             <div className="btn-group mr-2">
               <button
                 className="btn btn-md btn-outline-secondary"
                 data-toggle="modal"
-                data-target="#submitFileModal">
+                data-target="#submitFileModal"
+              >
                 Submit
               </button>
               <button className="btn btn-md btn-outline-secondary">
@@ -84,19 +111,12 @@ class Competition extends React.Component {
 
         <div id="description" className="py-2">
           <h4>Description</h4>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ac
-            malesuada nunc. Aliquam erat volutpat. Maecenas sit amet leo
-            sodales.
-          </p>
+          {renderHTML(competition.description)}
         </div>
 
         <div id="data" className="py-2">
           <h4>Data</h4>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ac
-            malesuada nunc.
-          </p>
+          {renderHTML(competition.dataDescription)}
           <p className="data-file">
             <i className="fas fa-file-alt" />
             train.xml

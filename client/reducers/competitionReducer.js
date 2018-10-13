@@ -1,6 +1,6 @@
 'use strict'
 import {
-  ACTION_CONTENT_SWITCH,
+  ACTION_COMPETITION_GETALL,
   ACTION_COMPETITION_CREATE
 } from '../constants/actionType'
 
@@ -8,7 +8,7 @@ import {
   competitions = [
     {
       title: '',
-      id: ''
+      _id: ''
     }
   ]
 
