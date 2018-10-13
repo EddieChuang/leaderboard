@@ -1,12 +1,22 @@
 'use strict'
 import {
-  ACTION_COMPETITION_CREATE,
-  ACTION_COMPETITION_CREATE_FAILED,
-  ACTION_CONTENT_CREATE,
-  ACTION_COMPETITION_SWITCH
+  ACTION_COMPETITION_GETALL,
+  ACTION_COMPETITION_CREATE
 } from '../constants/actionType'
 
 import CompetitionHandler from '../utils/CompetitionHandler'
+
+/**
+ * get all competitions
+ * @param
+ */
+export function getAllCompetitions() {
+  return dispatch => {
+    CompetitionHandler.getAll(competitions => {
+      dispatch({ type: ACTION_COMPETITION_GETALL, payload: { competitions } })
+    })
+  }
+}
 
 /**
  *
@@ -17,9 +27,7 @@ export function createCompetition(newCompetition, callback) {
     CompetitionHandler.create(newCompetition, (success, payload) => {
       callback(success, payload.message)
       if (success) {
-        // dispatch({ type: ACTION_COMPETITION_CREATE, payload })
-      } else {
-        // dispatch({ type: ACTION_COMPETITION_CREATE_FAILED, payload })
+        dispatch({ type: ACTION_COMPETITION_CREATE, payload })
       }
     })
   }

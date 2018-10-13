@@ -2,10 +2,8 @@
 import React from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import {
-  switchContent as switchContentAction
-  // switchCompetition as switchCompetitionAction
-} from '../../actions/contentActions'
+import { switchContent as switchContentAction } from '../../actions/contentActions'
+import { getAllCompetitions as getAllCompetitionsAction } from '../../actions/competitionAction'
 
 class Sidebar extends React.Component {
   constructor() {
@@ -13,7 +11,9 @@ class Sidebar extends React.Component {
     this.state = { activeItem: '' }
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.getAllCompetitions()
+  }
 
   renderCompetition = () => {
     const { activeId, competitions } = this.props
@@ -23,7 +23,8 @@ class Sidebar extends React.Component {
       return (
         <li
           className={className}
-          onClick={() => this.props.switchContent('1', competition.id)}>
+          onClick={() => this.props.switchContent('1', competition.id)}
+        >
           {competition.title}
         </li>
       )
@@ -37,7 +38,8 @@ class Sidebar extends React.Component {
           <ul className="nav flex-column">
             <li
               className="nav-item"
-              onClick={() => this.props.switchContent('0', '')}>
+              onClick={() => this.props.switchContent('0', '')}
+            >
               <a href="#" className="nav-link active">
                 <i className="fas fa-home" />
                 Dashboard
@@ -49,22 +51,25 @@ class Sidebar extends React.Component {
                 className="nav-link"
                 data-target="#competitionList"
                 data-toggle="collapse"
-                aria-expanded="false">
+                aria-expanded="false"
+              >
                 <i className="fab fa-ravelry" />
                 Competitions
               </a>
               <ul className="collapse list-group" id="competitionList">
                 <li
                   className="list-group-item active"
-                  onClick={() => this.props.switchContent('1', '0')}>
-                  {/* {this.renderCompetition()} */}
+                  onClick={() => this.props.switchContent('1', '0')}
+                >
                   Text Classification
                 </li>
+                {/* {this.renderCompetition()} */}
                 <li className="list-group-item">NER</li>
                 <li className="list-group-item">Image Caption</li>
                 <li
                   className="list-group-item text-center"
-                  onClick={() => this.props.switchContent('1', '-1')}>
+                  onClick={() => this.props.switchContent('1', '-1')}
+                >
                   <i className="fas fa-plus-circle" />
                 </li>
               </ul>
@@ -90,16 +95,16 @@ class Sidebar extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    // comepetitions: state.competition.competition,
-    // activeId: state.competition.competitionId
+    comepetitions: state.competition.competitions,
+    activeId: state.competition.activeId
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
-      switchContent: switchContentAction
-      // switchCompetition: switchCompetitionAction
+      switchContent: switchContentAction,
+      getAllCompetitions: getAllCompetitionsAction
     },
     dispatch
   )

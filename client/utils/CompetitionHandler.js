@@ -3,16 +3,18 @@ import { URL_COMPETITION_GET, URL_COMPETITION_CREATE } from '../constants/url'
 import auth from '../utils/auth'
 
 export default {
-  // get: callback => {
-  //   axios
-  //     .post(URL_EXERCISE_GET, { token: auth.getToken() })
-  //     .then(res => {
-  //       callback(true, '', res.data.exercises)
-  //     })
-  //     .catch(err => {
-  //       callback(false, res.response.data.message)
-  //     })
-  // },
+  getAll: callback => {
+    axios
+      .post(URL_COMPETITION_GETALL, { token: auth.getToken() })
+      .then(res => {
+        console.log(res)
+        callback(res.data.competitions)
+      })
+      .catch(err => {
+        console.log(err.response)
+        callback([])
+      })
+  },
 
   /**
    *
