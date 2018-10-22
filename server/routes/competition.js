@@ -11,12 +11,17 @@ const dateFormat = 'YYYY-MM-DD HH:mm'
 
 router.post('/get', (req, res, next) => {
   let { competitionId } = req.body
-  Competition.findById(competitionId).exec(function(err, competition) {
-    if (err) {
-      return res.status(500).json({ message: 'Server Error' })
-    }
-    res.status(200).json({ competition })
-  })
+  Competition.findById(competitionId)
+    .select('-solution')
+    .exec(function(err, competition) {
+      if (err) {
+        return res.status(500).json({ message: 'Server Error' })
+      }
+      competition.dataSources = competition.dataSources.map(data =>
+        data.substring(data.indexOf('-') + 1)
+      )
+      res.status(200).json({ competition })
+    })
 })
 
 // get all competition
@@ -29,6 +34,7 @@ router.post('/getall', (req, res, next) => {
       if (err) {
         return res.status(500).json({ message: 'Server Error' })
       }
+
       res.status(200).json({ competitions })
     })
 })
@@ -91,7 +97,7 @@ router.route('/create/:title').post((req, res, next) => {
         newCompetition.launchDate = launchDate
         newCompetition.closeDate = closeDate
         newCompetition.dataSources = dataSources
-        newCompetition.dataSources = solution
+        newCompetition.solution = solution
 
         newCompetition.save(function(err) {
           if (err) {

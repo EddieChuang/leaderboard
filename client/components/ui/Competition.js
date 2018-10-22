@@ -12,7 +12,12 @@ class Competition extends React.Component {
   constructor() {
     super()
     this.state = {
-      competition: { title: '', description: '', dataDescription: '' }
+      competition: {
+        title: '',
+        description: '',
+        dataDescription: '',
+        dataSources: []
+      }
     }
   }
 
@@ -28,6 +33,18 @@ class Competition extends React.Component {
     console.log('Competition componentWillReceiveProps')
     CompetitionHandler.get(props.competitionId, competition => {
       this.setState({ competition })
+    })
+  }
+
+  renderDataSources = () => {
+    const dataSources = this.state.competition.dataSources
+    return dataSources.map(data => {
+      return (
+        <p className="data-file">
+          <i className="fas fa-file-alt" />
+          <a href="#">{data}</a>
+        </p>
+      )
     })
   }
 
@@ -117,18 +134,7 @@ class Competition extends React.Component {
         <div id="data" className="py-2">
           <h4>Data</h4>
           {renderHTML(competition.dataDescription)}
-          <p className="data-file">
-            <i className="fas fa-file-alt" />
-            train.xml
-          </p>
-          <p className="data-file">
-            <i className="fas fa-file-alt" />
-            test.xml
-          </p>
-          <p className="data-file">
-            <i className="fas fa-file-alt" />
-            sample.csv
-          </p>
+          {this.renderDataSources()}
         </div>
 
         <div id="leaderboard" className="py-2 pb-5">

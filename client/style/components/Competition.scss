@@ -6,6 +6,15 @@
   margin-bottom: 0.25rem;
   color: $filename;
 }
-.data-file i {
-  margin-right: 3px;
+.data-file {
+  i {
+    margin-right: 3px;
+  }
+  a {
+    color: $filename;
+  }
+  a:hover {
+    color: lighten($filename, 20%);
+    text-decoration: none;
+  }
 }
